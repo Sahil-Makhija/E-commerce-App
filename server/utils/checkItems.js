@@ -26,8 +26,8 @@ const checkItems = async (productObject) => {
     return { productArray, totalAmt };
   } catch (error) {
     console.log(`Error in checkItems function: ${error.message}`);
-    throw error;
+    throw new Error(error.message);
   }
 };
 
-export default checkItems
+module.exports = checkItems

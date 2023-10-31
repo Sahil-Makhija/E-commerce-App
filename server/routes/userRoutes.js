@@ -5,7 +5,7 @@ const { createUser, loginUser, deleteUser, updateUser } = require('../controller
 
 
 router.get('/product/:slug',findOneProduct)
-router.get('/productbyId/:id',findProductByID)
+router.get('/product/id/:id',findProductByID)
 
 //for product search & filter
 router.get('/get/product', getAllProduct)

@@ -13,7 +13,9 @@ const createUser = catchError(async (req, res) => {
       "User with this email-id or phone number already exists!"
     );
   }
-  const newUser = await User.create({ ...req.body, user_id: uuid() });
+  const newUser = await User.create({ ...req.body, user_id: uuid() }).then((user)=>{
+    return User.findById(user._id).select("-password")
+  });
   return Res.Created({ newUser });
 });
 
@@ -22,7 +24,7 @@ const loginUser = catchError(async (req, res) => {
   let userData = await User.findOne({
     phoneNumber: req.body.phoneNumber,
     password: req.body.password,
-  });
+  }).select("-password");
   if (userData) {
     return Res.Found({ userData });
   }

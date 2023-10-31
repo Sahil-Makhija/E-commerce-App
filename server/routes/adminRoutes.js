@@ -6,7 +6,7 @@ const {
 } = require("../controllers/productControllers");
 
 const express = require("express");
-const getStats = require("../controllers/statsController");
+const getStats = require("../controllers/miscControllers");
 const { getAllOrders, cancelOrder, updateOrderStatus } = require("../controllers/orderControllers");
 const { getAllUsers, deleteUser } = require("../controllers/userControllers");
 const { createAdmin, getAdminData, getAuthQues } = require("../controllers/adminControllers" );

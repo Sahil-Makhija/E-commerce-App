@@ -61,12 +61,3 @@ class Response {
 }
 
 module.exports = Response;
-// export default
-
-// ReqPassed(status,data,message){
-//     return this.res.status(status||200).json({
-//         status:true,
-//         ...data,
-//         message
-//     })
-// }
