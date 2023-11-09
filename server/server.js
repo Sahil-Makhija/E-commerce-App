@@ -8,10 +8,12 @@ const connectToDatabase = require('./database');
 const adminRoutes = require('./routes/adminRoutes')
 const userRoutes = require('./routes/userRoutes')
 const orderRoutes = require('./routes/orderRoutes')
+const paymentRoutes = require('./routes/paymentRoutes')
 
 
 //Configuration
 const cookieParser = require('cookie-parser');
+const Product = require('./models/productModel');
 dotenv.config()
 const { PORT, MAINHOST,FRONTEND_URL } = process.env
 
@@ -19,7 +21,10 @@ const { PORT, MAINHOST,FRONTEND_URL } = process.env
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({origin:`${FRONTEND_URL}`}));
+app.use(cors({
+    origin:`${FRONTEND_URL}`,
+    credentials:true
+}));
 
 
 //database connection...
@@ -35,3 +40,4 @@ app.get('/', (req, res) => {
 app.use('/admin', adminRoutes)
 app.use('/',orderRoutes)
 app.use('/',userRoutes)
+app.use('/order/payment',paymentRoutes)

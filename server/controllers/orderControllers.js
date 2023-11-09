@@ -1,4 +1,5 @@
 const Order = require("../models/orderModel");
+const Product = require("../models/productModel");
 const { User } = require("../models/userModel");
 const Response = require("../utils/Response");
 const catchError = require("../utils/catchError");
@@ -6,15 +7,24 @@ const checkItems = require("../utils/checkItems");
 
 const createNewOrder = catchError(async (req, res) => {
   const Res = new Response(res);
-  const { productArray: orderItems, totalAmt: orderAmount } = checkItems(
+
+  //Verify Received Items
+  const { productArray: orderItems, totalAmt: orderAmount } = await checkItems(
     req.body.orderItems
   );
+
   if (orderItems && orderItems.length > 0) {
-    const { fullName, phoneNumber, user_id, address, modeOfPayment } = req.body;
+    const { user_id, modeOfPayment } = req.body;
+    //Get Necessary User Details
+    const user = await User.findById(user_id).select(
+      "name phoneNumber address"
+    );
+    const { name: fullName, phoneNumber, address } = user;
     const orderDate = new Date();
     const expectedDeliveryDate = new Date(orderDate);
     expectedDeliveryDate.setDate(orderDate.getDate() + 3);
-    let newOrder = await Order.create({
+    //Create Order
+    const newOrder = await Order.create({
       fullName,
       phoneNumber,
       expectedDeliveryDate,
@@ -26,10 +36,14 @@ const createNewOrder = catchError(async (req, res) => {
       modeOfPayment,
     });
     if (newOrder) {
-      User.findOneAndUpdate(
-        { user_id },
-        { $push: { ordersPending: newOrder._id } }
-      );
+      await Promise.all(orderItems.map(async(item)=>{
+        await Product.findByIdAndUpdate(item._id, {
+          $inc: { stock: -(item.qty || 1) },
+        }); 
+      }))
+      await User.findByIdAndUpdate(user_id, {
+        $push: { ordersPending: newOrder._id },
+      });
     }
     return Res.Created({ newOrder });
   } else {
@@ -38,31 +52,42 @@ const createNewOrder = catchError(async (req, res) => {
 });
 
 const updateOrder = {
-  "PENDING" : "SHIPPED",
-  "SHIPPED" : "DELIVERED"
-}
+  PENDING: "SHIPPED",
+  SHIPPED: "DELIVERED",
+};
 
-const updateOrderStatus = catchError(async(req,res)=>{
+const updateOrderStatus = catchError(async (req, res) => {
   const Res = new Response(res);
-  const {order_id} = req.body;
-  let currentStatus = await Order.findById(order_id).select("orderStatus").orderStatus;
-  if (currentStatus){
-    return await Order.findByIdAndUpdate(order_id,{orderStatus:updateOrder[currentStatus]},{new:true}).select("orderStatus").then((res)=>{
-      return Res.Updated({orderStatus:res.orderStatus})
-    })
+  const { order_id } = req.body;
+  let currentStatus = await Order.findById(order_id).select("orderStatus")
+    .orderStatus;
+  if (currentStatus) {
+    return await Order.findByIdAndUpdate(
+      order_id,
+      { orderStatus: updateOrder[currentStatus] },
+      { new: true }
+    )
+      .select("orderStatus")
+      .then((res) => {
+        return Res.Updated({ orderStatus: res.orderStatus });
+      });
+  } else {
+    Res.BadRequest("Order not found!");
   }
-  else {Res.BadRequest("Order not found!")}
-})
+});
 
 const cancelOrder = catchError(async (req, res) => {
   const Res = new Response(res);
-  const {order_id} = req.body;
-  let updated_order = await Order.findByIdAndUpdate(order_id,{orderStatus:"CANCELLED"},{new:true})
-  if (updated_order && updated_order.orderStatus === "CANCELLED"){
-    Res.Deleted('This Order was cancelled!')
-  }
-  else{
-    Res.BadRequest('Order not found. Try again later!')
+  const { order_id } = req.body;
+  let updated_order = await Order.findByIdAndUpdate(
+    order_id,
+    { orderStatus: "CANCELLED" },
+    { new: true }
+  );
+  if (updated_order && updated_order.orderStatus === "CANCELLED") {
+    Res.Deleted("This Order was cancelled!");
+  } else {
+    Res.BadRequest("Order not found. Try again later!");
   }
 });
 
@@ -79,4 +104,9 @@ const getAllOrders = catchError(async (req, res) => {
   }
 });
 
-module.exports = { createNewOrder, getAllOrders,updateOrderStatus, cancelOrder };
+module.exports = {
+  createNewOrder,
+  getAllOrders,
+  updateOrderStatus,
+  cancelOrder,
+};

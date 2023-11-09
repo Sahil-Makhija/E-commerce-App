@@ -16,7 +16,10 @@ const createProduct = catchError(async (req, res) => {
 
 const findOneProduct = catchError(async (req, res) => {
   const Res = new Response(res);
-  let product = await Product.findOne({ slug: req.params.slug });
+  let product = await Product.findOne({
+    slug: req.params.slug,
+    Archived: false,
+  });
   if (product) {
     return Res.Found({ product });
   } else {
@@ -26,7 +29,9 @@ const findOneProduct = catchError(async (req, res) => {
 
 const findProductByID = catchError(async (req, res) => {
   const Res = new Response(res);
-  let product = await Product.findById(req.params.id);
+  let product = await Product.findById(req.params.id).then((product) =>
+    !product.Archived ? product : null
+  );
   if (product) {
     Res.Found({ product });
   } else {
@@ -34,13 +39,35 @@ const findProductByID = catchError(async (req, res) => {
   }
 });
 
-//TODO :  Add Search Functionality
+//TODO :  Add GT, LT , ET Functionality
 const getAllProduct = catchError(async (req, res) => {
   const Res = new Response(res);
+  const search = req.body?.search;
+  const filter = !!search
+    ? {
+        ...req.body?.filter,
+        productName: {
+          $regex: search,
+          $options: "i",
+        },
+      }
+    : req.body.filter || {};
+
   const limit = req.body.limit || 5;
   const page = req.body.page || 1;
   const skip = (page - 1) * limit;
-  let products = await Product.find(req.body.filter).skip(skip).limit(limit);
+
+  const skipFields = `-productDescription -highlights -stock -Archived ${
+    !req.body.filter && " -Featured"
+  }`;
+  let products = await Product.find({
+    ...filter,
+    Archived: false,
+    Featured: req.body.featured || false,
+  },{images:{$slice:1}})
+    .skip(skip)
+    .limit(limit)
+    .select(skipFields);
   if (products && products.length > 0) {
     return Res.Found({ products });
   } else {
@@ -51,7 +78,9 @@ const getAllProduct = catchError(async (req, res) => {
 const updateProduct = catchError(async (req, res) => {
   const Res = new Response(res);
   const _id = req.body.productID;
-  let updatedProduct = await Product.findByIdAndUpdate(_id, req.body.newData);
+  let updatedProduct = await Product.findByIdAndUpdate(_id, req.body.newData, {
+    new: true,
+  });
   if (updatedProduct) {
     return Res.Updated({ updatedProduct });
   } else {

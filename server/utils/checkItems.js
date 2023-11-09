@@ -8,15 +8,12 @@ const checkItems = async (productObject) => {
     await Promise.all(
       productList.map(async (prodID) => {
         await Product.findById(prodID)
-          .select("stock productSP")
+          .select("stock productSP productName")
           .then(async (res) => {
-            let { stock, productSP: price } = res;
+            let { stock, productSP: price, productName: name } = res;
             let qty = Math.min(Number(productObject[prodID]), stock);
-            productArray.push({ [prodID]: { price, qty } });
+            productArray.push({ _id: prodID, price, qty, name });
             totalAmt = totalAmt + qty * price;
-            await Product.findByIdAndUpdate(prodID, {
-              $inc: { stock: -qty },
-            });
           })
           .catch(() => {
             return console.log(`Product with ID ${prodID} not found.`);
@@ -30,4 +27,4 @@ const checkItems = async (productObject) => {
   }
 };
 
-module.exports = checkItems
+module.exports = checkItems;

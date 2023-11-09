@@ -6,7 +6,7 @@ const {
 } = require("../controllers/productControllers");
 
 const express = require("express");
-const getStats = require("../controllers/miscControllers");
+const {getStats} = require("../controllers/miscControllers");
 const { getAllOrders, cancelOrder, updateOrderStatus } = require("../controllers/orderControllers");
 const { getAllUsers, deleteUser } = require("../controllers/userControllers");
 const { createAdmin, getAdminData, getAuthQues } = require("../controllers/adminControllers" );
@@ -17,7 +17,7 @@ const router = express.Router();
 router.post('/product/new',createProduct)
 
 //Read all product
-router.get("/products/all",getAllProduct);
+router.post("/products/all",getAllProduct);
 
 // Update Product
 router.post('/product/update',updateProduct)

@@ -9,7 +9,6 @@ const productSchema = new mongoose.Schema({
     },
     productDescription: {
         type: String,
-        // required: [true, "Please Enter product description"],
     },
     productMRP: {
         type: Number,
@@ -42,7 +41,15 @@ const productSchema = new mongoose.Schema({
         type: String,
         trim:true,
         required:[true,'Product Slug is required!']
-    }
+    },
+    Featured:{
+        type:Boolean,
+        default:false
+    },
+    Archived:{
+        type:Boolean,
+        default:false
+    },
 })
 
 

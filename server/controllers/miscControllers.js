@@ -14,4 +14,14 @@ const getStats = catchError(async (req, res) => {
   return Res.Found({...stats})
 });
 
-module.exports = getStats;
+const getFeaturedProducts = catchError(async(req,res)=>{
+  const Res = new Response(res);
+  console.log(req.query);
+  const featuredProducts = await Product.find({featured:true})
+  if (featuredProducts){
+    return Res.Found({featuredProducts})
+  }
+  return Res.NotFound("Couldn't find any featured products.")
+})
+
+module.exports = {getStats,getFeaturedProducts};

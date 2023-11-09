@@ -13,18 +13,27 @@ const createUser = catchError(async (req, res) => {
       "User with this email-id or phone number already exists!"
     );
   }
-  const newUser = await User.create({ ...req.body, user_id: uuid() }).then((user)=>{
-    return User.findById(user._id).select("-password")
-  });
+  const newUser = await User.create({ ...req.body, user_id: uuid() }).then(
+    (user) => {
+      return User.findById(user._id).select("-password");
+    }
+  );
   return Res.Created({ newUser });
 });
 
 const loginUser = catchError(async (req, res) => {
   const Res = new Response(res);
-  let userData = await User.findOne({
-    phoneNumber: req.body.phoneNumber,
-    password: req.body.password,
-  }).select("-password");
+  const { user_id } = req.cookies;
+  let userData;
+  if (user_id) {
+    userData = await User.findOne({ user_id }).select("-password");
+  }
+  else{
+    userData = await User.findOne({
+      phoneNumber: req.body.phoneNumber,
+      password: req.body.password,
+    }).select("-password");
+  }
   if (userData) {
     return Res.Found({ userData });
   }

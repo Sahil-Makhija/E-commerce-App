@@ -1,14 +1,18 @@
 const express = require('express');
 const router = express.Router()
 const { findOneProduct, findProductByID, getAllProduct } = require('../controllers/productControllers');
-const { createUser, loginUser, deleteUser, updateUser } = require('../controllers/userControllers')
+const { createUser, loginUser, deleteUser, updateUser } = require('../controllers/userControllers');
+const { getFeaturedProducts } = require('../controllers/miscControllers');
 
 
 router.get('/product/:slug',findOneProduct)
 router.get('/product/id/:id',findProductByID)
 
 //for product search & filter
-router.get('/get/product', getAllProduct)
+router.post('/get/product', getAllProduct)
+
+//Get Featured Products
+router.get("/get/featured",getFeaturedProducts)
 
 //*user signup
 router.post('/user/signup', createUser)

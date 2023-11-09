@@ -39,6 +39,10 @@ const orderSchema = new mongoose.Schema({
     orderAmount:{
         type:Number,
         required:[true,'amt paid is required!']
+    },
+    isPaid:{
+        type:Boolean,
+        default:false
     }
 })
 
