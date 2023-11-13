@@ -1,4 +1,4 @@
-import adminReducer  from "./adminReducer"
+import adminReducer  from "./AdminReducer"
 import { orderReducer } from "./orderReducer"
 // import { productReducer } from "./productReducer"
 import userReducer from "./userReducer"
