@@ -1,0 +1,2 @@
+export const PRODUCT_PREVIEW = "PRODUCT_PREVIEW"; 
+export const ORDER_STATUS = "ORDER_STATUS"

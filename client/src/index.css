@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  overflow-x: hidden;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+*:focus {
+  outline: none;
+}
+
+.test {
+  @apply border-2 border-black;
+}
+
+.flex-center {
+  @apply flex justify-evenly items-center;
+}
+
+.border-gray {
+  @apply border-gray-300 border-[1.6px];
+}
+
+input[type="number"]::-webkit-inner-spin-button {
+  display: none;
+}

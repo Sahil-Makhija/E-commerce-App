@@ -5,7 +5,6 @@ const isAdmin = async (req,res,next) =>{
     if (admin_id){
         if (await checkForAdmin(admin_id)){
             next()
-    
         }
         else{
             res.end('you are not authenticated to access this source')

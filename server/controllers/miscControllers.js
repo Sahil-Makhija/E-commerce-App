@@ -16,7 +16,6 @@ const getStats = catchError(async (req, res) => {
 
 const getFeaturedProducts = catchError(async(req,res)=>{
   const Res = new Response(res);
-  console.log(req.query);
   const featuredProducts = await Product.find({featured:true})
   if (featuredProducts){
     return Res.Found({featuredProducts})

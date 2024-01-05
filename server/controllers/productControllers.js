@@ -57,9 +57,7 @@ const getAllProduct = catchError(async (req, res) => {
   const page = req.body.page || 1;
   const skip = (page - 1) * limit;
 
-  const skipFields = `-productDescription -highlights -stock -Archived ${
-    !req.body.filter && " -Featured"
-  }`;
+  const skipFields = `-productDescription -highlights -stock -Archived`;
   const products = await Product.find({
     ...filter,
     Archived: false,
